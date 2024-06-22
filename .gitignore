@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+instance/
+
+git init
+git add .
+git commit -m "Login et Redirection done"
+git branch -M master
+git remote add origin https://github.com/Takkino31/cardio-app.git
+git push -u origin master

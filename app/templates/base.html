@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Cardio App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  </head>
+  <body>
+    <header>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('main.index') }}">Accueil</a></li>
+          <li><a href="{{ url_for('main.login') }}">Connexion</a></li>
+          <li><a href="{{ url_for('main.register') }}">Inscription</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+    <footer>
+      © 2024 Cardio App. Tous droits réservés.
+    </footer>
+  </body>
+</html>

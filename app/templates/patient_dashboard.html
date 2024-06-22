@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tableau de bord du patient</title>
+</head>
+<body>
+    <h1>Tableau de bord du patient</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Résultat de l'analyse</th>
+                <th>Commentaires</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for analysis_result in analysis_results %}
+            <tr>
+                <td>{{ analysis_result.result }}</td>
+                <td>{{ analysis_result.comments }}</td>
+                <td>{{ analysis_result.timestamp }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ url_for('main.logout') }}">Déconnexion</a>
+</body>
+</html>

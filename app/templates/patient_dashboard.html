@@ -1,29 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Tableau de bord du patient</title>
+    <title>Tableau de Bord Patient</title>
 </head>
 <body>
-    <h1>Tableau de bord du patient</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Résultat de l'analyse</th>
-                <th>Commentaires</th>
-                <th>Timestamp</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for analysis_result in analysis_results %}
-            <tr>
-                <td>{{ analysis_result.result }}</td>
-                <td>{{ analysis_result.comments }}</td>
-                <td>{{ analysis_result.timestamp }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <a href="{{ url_for('main.logout') }}">Déconnexion</a>
+    <h1>Tableau de Bord Patient</h1>
+    <a href="{{ url_for('main.request_diagnostic') }}">Demander un Diagnostic</a>
+    <h2>Mes Diagnostics</h2>
+    <ul>
+        {% for diagnostic in diagnostics %}
+            <li>
+                <p>ECG: {{ diagnostic.ecg_data }}</p>
+                {% if diagnostic.diagnosis %}
+                    <p>Diagnostic: {{ diagnostic.diagnosis }}</p>
+                {% else %}
+                    <p>En attente du diagnostic...</p>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
 </body>
 </html>

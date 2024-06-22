@@ -1,8 +1,10 @@
+# routes.py
 from flask import Blueprint, request, render_template, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from .models import User
+from .models import User, Diagnostic
 from . import db
+from datetime import datetime
 
 bp = Blueprint('main', __name__)
 
@@ -21,7 +23,6 @@ def register():
             flash('Utilisateur déjà existant', 'danger')
             return redirect(url_for('main.register'))
 
-        # Définition du rôle par défaut comme 'patient' si aucun n'est spécifié dans le formulaire
         role = data.get('role', 'patient')
 
         new_user = User(
@@ -32,8 +33,6 @@ def register():
         )
         db.session.add(new_user)
         db.session.commit()
-
-        # Connexion automatique de l'utilisateur après l'inscription réussie
         login_user(new_user)
 
         flash('Inscription réussie', 'success')
@@ -81,7 +80,11 @@ def doctor_dashboard():
     if current_user.role != 'doctor':
         flash('Accès interdit', 'danger')
         return redirect(url_for('main.index'))
-    return render_template('doctor.html')
+    
+    diagnostics = Diagnostic.query.filter(Diagnostic.diagnosis == None).all()
+    for diag in diagnostics:
+        print(f"Diagnostic ID: {diag.id}, Patient ID: {diag.patient_id}, ECG Data: {diag.ecg_data}")
+    return render_template('doctor_dashboard.html', diagnostics=diagnostics)
 
 @bp.route('/patient_dashboard')
 @login_required
@@ -89,4 +92,43 @@ def patient_dashboard():
     if current_user.role != 'patient':
         flash('Accès interdit', 'danger')
         return redirect(url_for('main.index'))
-    return render_template('patient.html')
+    
+    diagnostics = Diagnostic.query.filter_by(patient_id=current_user.id).all()
+    return render_template('patient_dashboard.html', diagnostics=diagnostics)
+
+@bp.route('/request_diagnostic', methods=['GET', 'POST'])
+@login_required
+def request_diagnostic():
+    if request.method == 'POST':
+        ecg_data = request.form.get('ecg_data')
+        
+        new_diagnostic = Diagnostic(
+            patient_id=current_user.id,
+            ecg_data=ecg_data
+        )
+        db.session.add(new_diagnostic)
+        db.session.commit()
+        flash('Demande de diagnostic envoyée', 'success')
+        return redirect(url_for('main.patient_dashboard'))
+    
+    return render_template('request_diagnostic.html')
+
+@bp.route('/respond_diagnostic/<int:diagnostic_id>', methods=['GET', 'POST'])
+@login_required
+def respond_diagnostic(diagnostic_id):
+    diagnostic = Diagnostic.query.get(diagnostic_id)
+    
+    if request.method == 'POST':
+        diagnosis = request.form.get('diagnosis')
+        
+        diagnostic.diagnosis = diagnosis
+        diagnostic.doctor_id = current_user.id
+        diagnostic.responded_at = datetime.utcnow()
+        
+        db.session.commit()
+        flash('Diagnostic envoyé', 'success')
+        return redirect(url_for('main.doctor_dashboard'))
+    
+    return render_template('respond_diagnostic.html', diagnostic=diagnostic)
+
+

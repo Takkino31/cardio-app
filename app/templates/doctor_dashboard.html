@@ -1,29 +1,26 @@
+<!-- doctor_dashboard.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Tableau de bord du médecin</title>
+    <title>Dashboard du Médecin</title>
 </head>
 <body>
-    <h1>Tableau de bord du médecin</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Patient</th>
-                <th>Données ECG</th>
-                <th>Timestamp</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for ecg_data, user in ecg_records %}
-            <tr>
-                <td>{{ user.username }}</td>
-                <td>{{ ecg_data.ecg_values }}</td>
-                <td>{{ ecg_data.timestamp }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <a href="{{ url_for('main.logout') }}">Déconnexion</a>
+    <h1>Dashboard du Médecin</h1>
+    {% for diagnostic in diagnostics %}
+        <div>
+            <p>Patient: {{ diagnostic.patient.username }}</p>
+            <p>Date de la demande: {{ diagnostic.requested_at }}</p>
+            <p>ECG: {{ diagnostic.ecg_data }}</p>
+            {% if diagnostic.diagnosis %}
+                <p>Diagnostic: {{ diagnostic.diagnosis }}</p>
+                <p>Date de la réponse: {{ diagnostic.responded_at }}</p>
+            {% else %}
+                <form action="{{ url_for('main.respond_diagnostic', diagnostic_id=diagnostic.id) }}" method="POST">
+                    <textarea name="diagnosis" placeholder="Écrire le diagnostic ici..."></textarea>
+                    <button type="submit">Envoyer</button>
+                </form>
+            {% endif %}
+        </div>
+    {% endfor %}
 </body>
 </html>

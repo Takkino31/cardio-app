@@ -80,11 +80,11 @@ def doctor_dashboard():
     if current_user.role != 'doctor':
         flash('Accès interdit', 'danger')
         return redirect(url_for('main.index'))
+
+    pending_diagnostics = Diagnostic.query.filter(Diagnostic.diagnosis == None).all()
+    treated_diagnostics = Diagnostic.query.filter(Diagnostic.diagnosis != None, Diagnostic.doctor_id == current_user.id).all()
     
-    diagnostics = Diagnostic.query.filter(Diagnostic.diagnosis == None).all()
-    for diag in diagnostics:
-        print(f"Diagnostic ID: {diag.id}, Patient ID: {diag.patient_id}, ECG Data: {diag.ecg_data}")
-    return render_template('doctor_dashboard.html', diagnostics=diagnostics)
+    return render_template('doctor_dashboard.html', pending_diagnostics=pending_diagnostics, treated_diagnostics=treated_diagnostics)
 
 @bp.route('/patient_dashboard')
 @login_required
@@ -92,7 +92,7 @@ def patient_dashboard():
     if current_user.role != 'patient':
         flash('Accès interdit', 'danger')
         return redirect(url_for('main.index'))
-    
+
     diagnostics = Diagnostic.query.filter_by(patient_id=current_user.id).all()
     return render_template('patient_dashboard.html', diagnostics=diagnostics)
 
@@ -101,7 +101,7 @@ def patient_dashboard():
 def request_diagnostic():
     if request.method == 'POST':
         ecg_data = request.form.get('ecg_data')
-        
+
         new_diagnostic = Diagnostic(
             patient_id=current_user.id,
             ecg_data=ecg_data
@@ -110,25 +110,40 @@ def request_diagnostic():
         db.session.commit()
         flash('Demande de diagnostic envoyée', 'success')
         return redirect(url_for('main.patient_dashboard'))
-    
+
     return render_template('request_diagnostic.html')
 
 @bp.route('/respond_diagnostic/<int:diagnostic_id>', methods=['GET', 'POST'])
 @login_required
 def respond_diagnostic(diagnostic_id):
     diagnostic = Diagnostic.query.get(diagnostic_id)
-    
+
     if request.method == 'POST':
         diagnosis = request.form.get('diagnosis')
-        
+
         diagnostic.diagnosis = diagnosis
         diagnostic.doctor_id = current_user.id
         diagnostic.responded_at = datetime.utcnow()
-        
+
         db.session.commit()
         flash('Diagnostic envoyé', 'success')
         return redirect(url_for('main.doctor_dashboard'))
-    
+
     return render_template('respond_diagnostic.html', diagnostic=diagnostic)
 
+@bp.route('/edit_diagnostic/<int:diagnostic_id>', methods=['GET', 'POST'])
+@login_required
+def edit_diagnostic(diagnostic_id):
+    diagnostic = Diagnostic.query.get(diagnostic_id)
 
+    if request.method == 'POST':
+        diagnosis = request.form.get('diagnosis')
+
+        diagnostic.diagnosis = diagnosis
+        diagnostic.responded_at = datetime.utcnow()
+
+        db.session.commit()
+        flash('Diagnostic modifié', 'success')
+        return redirect(url_for('main.doctor_dashboard'))
+
+    return render_template('edit_diagnostic.html', diagnostic=diagnostic)

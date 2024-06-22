@@ -4,7 +4,7 @@ instance/
 
 git init
 git add .
-git commit -m "Diagnostic asked by patient and answeered by doctor"
+git commit -m "Edited a diagnostic already send to patient done"
 git branch -M master
 git remote add origin https://github.com/Takkino31/cardio-app.git
 git push -u origin master

@@ -2,6 +2,16 @@
 {% block content %}
 <div class="container">
     <h1 class="mt-5">Dashboard du Patient</h1>
+
+    <h2 class="mt-4">Faire une nouvelle demande de diagnostic</h2>
+    <form action="{{ url_for('main.request_diagnostic') }}" method="POST">
+        <div class="form-group">
+            <label for="ecg_data">Données ECG</label>
+            <textarea class="form-control" name="ecg_data" id="ecg_data" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Envoyer la demande</button>
+    </form>
+
     <h2 class="mt-4">Mes Diagnostics</h2>
     {% for diagnostic in diagnostics %}
         <div class="card mt-3">

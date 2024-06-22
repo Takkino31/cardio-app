@@ -1,38 +1,44 @@
-<!-- doctor_dashboard.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Dashboard du Médecin</title>
-</head>
-<body>
-    <h1>Dashboard du Médecin</h1>
-    
-    <h2>Diagnostics en attente</h2>
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h1 class="mt-5">Dashboard du Médecin</h1>
+
+    <h2 class="mt-4">Diagnostics en attente</h2>
     {% for diagnostic in pending_diagnostics %}
-        <div>
-            <p>Patient: {{ diagnostic.patient.username }}</p>
-            <p>Date de la demande: {{ diagnostic.requested_at }}</p>
-            <p>ECG: {{ diagnostic.ecg_data }}</p>
-            <form action="{{ url_for('main.respond_diagnostic', diagnostic_id=diagnostic.id) }}" method="POST">
-                <textarea name="diagnosis" placeholder="Écrire le diagnostic ici..."></textarea>
-                <button type="submit">Envoyer</button>
-            </form>
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5 class="card-title">Patient: {{ diagnostic.patient.username }}</h5>
+                <p class="card-text">Date de la demande: {{ diagnostic.requested_at }}</p>
+                <p class="card-text">ECG: {{ diagnostic.ecg_data }}</p>
+                <form action="{{ url_for('main.respond_diagnostic', diagnostic_id=diagnostic.id) }}" method="POST">
+                    <div class="form-group">
+                        <label for="diagnosis">Écrire le diagnostic ici:</label>
+                        <textarea class="form-control" name="diagnosis" id="diagnosis" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Envoyer</button>
+                </form>
+            </div>
         </div>
     {% endfor %}
-    
-    <h2>Diagnostics traités</h2>
+
+    <h2 class="mt-4">Diagnostics traités</h2>
     {% for diagnostic in treated_diagnostics %}
-        <div>
-            <p>Patient: {{ diagnostic.patient.username }}</p>
-            <p>Date de la demande: {{ diagnostic.requested_at }}</p>
-            <p>ECG: {{ diagnostic.ecg_data }}</p>
-            <p>Diagnostic: {{ diagnostic.diagnosis }}</p>
-            <p>Date de la réponse: {{ diagnostic.responded_at }}</p>
-            <form action="{{ url_for('main.edit_diagnostic', diagnostic_id=diagnostic.id) }}" method="POST">
-                <textarea name="diagnosis">{{ diagnostic.diagnosis }}</textarea>
-                <button type="submit">Modifier</button>
-            </form>
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5 class="card-title">Patient: {{ diagnostic.patient.username }}</h5>
+                <p class="card-text">Date de la demande: {{ diagnostic.requested_at }}</p>
+                <p class="card-text">ECG: {{ diagnostic.ecg_data }}</p>
+                <p class="card-text">Diagnostic: {{ diagnostic.diagnosis }}</p>
+                <p class="card-text">Date de la réponse: {{ diagnostic.responded_at }}</p>
+                <form action="{{ url_for('main.edit_diagnostic', diagnostic_id=diagnostic.id) }}" method="POST">
+                    <div class="form-group">
+                        <label for="diagnosis">Modifier le diagnostic:</label>
+                        <textarea class="form-control" name="diagnosis" id="diagnosis" rows="3">{{ diagnostic.diagnosis }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Modifier</button>
+                </form>
+            </div>
         </div>
     {% endfor %}
-</body>
-</html>
+</div>
+{% endblock %}
